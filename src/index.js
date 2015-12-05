@@ -18,7 +18,8 @@ _.each(analizersInDir, i => analizers.push(i))
 
 
 function crawShadow(page, cb) {
-  setTimeout(craw, 500, page, cb)
+  let wait = Math.floor(Math.random() * 4)
+  setTimeout(craw, wait * 200, page, cb)
 }
 // 核心抓取函数
 function craw(page, cb) {
@@ -76,8 +77,11 @@ export default class Spider{
             console.log("服务器目前没有待处理的项目, 将于5秒后重试")
             setTimeout(() => next(null), 5000)
           } else {
-            async.mapSeries(items, crawShadow, (err, results) => {
-              this.task.submit(results, () => next(null))
+            async.map(items, crawShadow, (err, results) => {
+              this.task.submit(results, () => {
+                setTimeout(()=>next(null), 600)
+                
+              })
               
             })
           }
