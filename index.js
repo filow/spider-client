@@ -1,7 +1,7 @@
 var Spider = require('./dist')
 
 var client = new Spider({
-  server: '127.0.0.1',
+  server: 'filowlee.com',
   port: 3000
 })
 client.run()
