@@ -27,6 +27,7 @@ class Request {
     request.get(url)
       .set('Accept-Encoding', 'gzip, deflate')
       .set('User-Agent', getUa())
+      .timeout(10000)
       .set('Referer', 'http://www.douban.com/')
       // .set('cookie', cookie)
       .redirects(0)
