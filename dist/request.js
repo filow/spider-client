@@ -40,7 +40,9 @@ var Request = (function () {
   _createClass(Request, null, [{
     key: 'get',
     value: function get(url, callback) {
-      _superagent2['default'].get(url).set('Accept-Encoding', 'gzip, deflate').set('User-Agent', getUa()).set('Referer', 'http://www.douban.com/').set('cookie', cookie).redirects(0).set('Connection', 'keep-alive').agent(keepaliveAgent).end(function (err, res) {
+      _superagent2['default'].get(url).set('Accept-Encoding', 'gzip, deflate').set('User-Agent', getUa()).set('Referer', 'http://www.douban.com/')
+      // .set('cookie', cookie)
+      .redirects(0).set('Connection', 'keep-alive').agent(keepaliveAgent).end(function (err, res) {
         // 如果发生了错误
         if (err) {
           if (err.status) {

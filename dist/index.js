@@ -66,7 +66,7 @@ var Spider = (function () {
     // 合并设置项
     this.options = {
       retry_interval: 5000,
-      wait_interval: 500
+      wait_interval: 0
     };
     _lodash2['default'].merge(this.options, options);
 
@@ -99,7 +99,7 @@ var Spider = (function () {
               (function () {
                 // 对每个任务执行抓取函数，并将结果提交
                 var now = new Date();
-                _async2['default'].mapSeries(items, _this.crawl.bind(_this), function (err, results) {
+                _async2['default'].map(items, _this.crawl.bind(_this), function (err, results) {
                   var stats = {
                     total_time: new Date() - now,
                     memory: {

@@ -28,7 +28,7 @@ class Request {
       .set('Accept-Encoding', 'gzip, deflate')
       .set('User-Agent', getUa())
       .set('Referer', 'http://www.douban.com/')
-      .set('cookie', cookie)
+      // .set('cookie', cookie)
       .redirects(0)
       .set('Connection', 'keep-alive')
       .agent(keepaliveAgent)

@@ -16,14 +16,6 @@ exports['default'] = function (url, $) {
   var result = { title: '', keywords: [] };
 
   result.title = $('title').text().trim();
-  // keywords
-  var keywords = $('meta[name=keywords]').attr('content');
-  if (keywords) {
-    keywords = keywords.trim().split(',').map(function (s) {
-      return s.trim();
-    });
-    result.keywords = keywords;
-  }
   // description
   result.description = $('meta[name=description]').attr('content');
 

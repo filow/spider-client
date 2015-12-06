@@ -1,5 +1,5 @@
 // 三方库以及Nodejs自带库
-import _ from 'lodash';
+import _ from 'lodash'
 import cheerio from 'cheerio'
 import requireDir from 'require-dir' // 将一个目录下所有的文件都require进来
 import async from 'async'
@@ -22,7 +22,7 @@ export default class Spider{
     // 合并设置项
     this.options = {
       retry_interval: 5000,
-      wait_interval: 500
+      wait_interval: 0
     }
     _.merge(this.options, options)
     
@@ -46,7 +46,7 @@ export default class Spider{
           } else {
             // 对每个任务执行抓取函数，并将结果提交
             let now = new Date()
-            async.mapSeries(items, this.crawl.bind(this), (err, results) => {
+            async.map(items, this.crawl.bind(this), (err, results) => {
               let stats = {
                 total_time: new Date() - now,
                 memory: {
@@ -81,7 +81,6 @@ export default class Spider{
   crawl(page, cb) {
     setTimeout(this._crawl.bind(this), this.options.wait_interval, page, cb)
   }
-  
   _crawl(page, cb) {
     if (!page) cb(null, null)
     let { loc, priority, errors } =  page;

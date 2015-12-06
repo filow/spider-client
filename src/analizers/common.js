@@ -7,12 +7,6 @@ export default function (url, $){
   let result = {title: '', keywords: []}
 
   result.title = $('title').text().trim();
-  // keywords
-  let keywords = $('meta[name=keywords]').attr('content');
-  if (keywords) {
-    keywords = keywords.trim().split(',').map((s) => s.trim())
-    result.keywords = keywords
-  }
   // description
   result.description = $('meta[name=description]').attr('content');
 
