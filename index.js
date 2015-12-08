@@ -1,6 +1,5 @@
-var Spider = require('./dist')
-
-var client = new Spider({
+var Spider = require('./built')
+var client = new Spider["default"]({
   server: 'filowlee.com',
   port: 3000
 })

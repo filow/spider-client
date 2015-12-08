@@ -1,23 +1,47 @@
 // 三方库以及Nodejs自带库
-import _ from 'lodash'
-import cheerio from 'cheerio'
-import requireDir from 'require-dir' // 将一个目录下所有的文件都require进来
-import async from 'async'
+import * as _ from 'lodash'
+import * as cheerio from 'cheerio'
+/// <reference path="../libs/require-dir.d.ts" />
+import {requireDir} from 'require-dir' // 将一个目录下所有的文件都require进来
+import * as async from 'async'
 
-import os from 'os'
-import process from 'process'
+import * as os from 'os'
 
 // 功能类库
-import Request from './request.js'
+import Request from './request'
 import Connection from './server_connect'
-import logger from './logger.js'
+import Logger from './logger'
+
+let logger = new Logger()
+
+interface AnalizerFunc {
+  (url: string, $: any): any
+}
+interface ResultProps {
+  loc: string,
+  priority: number,
+  errors: any[],
+  success: boolean,
+  text?: string,
+  keywords?: string[],
+  size?: number,
+  time_used?: number
+}
+interface ErrorsProps {
+  code: string,
+  message: string,
+  time: number,
+  id: string
+}
 // 分析器和过滤器
-let analizers = []
+let analizers:AnalizerFunc[] = []
 // 分析器, analizer目录下所有的东西都会包含进来
 let analizersInDir = requireDir('./analizers', {camelcase: true})
 _.each(analizersInDir, i => analizers.push(i))
 
 export default class Spider{
+  private options:any;
+  private task:Connection;
   constructor(options) {
     // 合并设置项
     this.options = {
@@ -45,10 +69,10 @@ export default class Spider{
             setTimeout(() => next(null), this.options.retry_interval)
           } else {
             // 对每个任务执行抓取函数，并将结果提交
-            let now = new Date()
+            let now = Date.now()
             async.map(items, this.crawl.bind(this), (err, results) => {
               let stats = {
-                total_time: new Date() - now,
+                total_time: Date.now() - now,
                 memory: {
                   free: os.freemem(),
                   usage: process.memoryUsage(),
@@ -74,7 +98,7 @@ export default class Spider{
         
       });
 
-    })
+    }, ()=> {})
 
   }
   
@@ -84,10 +108,10 @@ export default class Spider{
   _crawl(page, cb) {
     if (!page) cb(null, null)
     let { loc, priority, errors } =  page;
-    let now = new Date()
+    let now = Date.now()
     Request.get(loc, (err, res) => {
       if (err || !res.ok) {
-        let errInfo = {
+        let errInfo:ErrorsProps = {
           code: err.code,
           message: err.msg,
           time: Number(new Date()),
@@ -101,14 +125,14 @@ export default class Spider{
       } else {
         let $ = cheerio.load(res.text)
         // 提取结果对象
-        let props = {loc, priority, errors, success: true}
+        let props:ResultProps = {loc, priority, errors, success: true}
         // 遍历分析器，把每个分析器返回的结果合并
         analizers.forEach((func) => {
           let result = func(loc, $)
           _.merge(props, result)
         })
         props.size = parseInt(res.headers['content-length']);
-        props.time_used = new Date() - now;
+        props.time_used = Date.now() - now;
         logger.success('get', `${loc} OK`)
         cb(null, props);
       }

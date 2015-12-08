@@ -1,4 +1,4 @@
-export function spaceTrim(str){
+export function spaceTrim(str:string):string{
   if (str) {
     return str.trim().replace(/\s+/g, ' ')
   } else {

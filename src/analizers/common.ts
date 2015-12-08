@@ -1,10 +1,10 @@
-import {spaceTrim} from '../util.js';
-import nurl from 'url'
+import {spaceTrim} from '../util';
+import * as nurl from 'url'
 
 
 
 export default function (url, $){
-  let result = {title: '', keywords: []}
+  let result = {title: '', keywords: [], description: ""}
 
   result.title = $('title').text().trim();
   // description

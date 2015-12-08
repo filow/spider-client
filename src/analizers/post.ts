@@ -1,6 +1,10 @@
-import {spaceTrim} from '../util.js';
-
-export default function (url, $){
+import {spaceTrim} from '../util';
+interface SpecifiedResult {
+  text?: string, 
+  keywords?: string[],
+  
+}
+export default function (url:string, $):SpecifiedResult{
   // 检验该网页是否为本分析器适用
   if (/cn.engadget.com(\/\d+){3}/.test(url)){
     let description = [];
@@ -13,5 +17,4 @@ export default function (url, $){
   }else{
     return {}
   }
-
 }

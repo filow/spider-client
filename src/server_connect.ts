@@ -1,24 +1,19 @@
-import request from 'superagent';
-import Agent from 'agentkeepalive'
-import os from 'os'
-import process from 'process'
+import * as request from 'superagent';
+import * as os from 'os'
 
-import logger from './logger'
-let keepaliveAgent = new Agent({
-  maxSockets: 100,
-  maxFreeSockets: 10,
-  timeout: 20000,
-  keepAliveTimeout: 30000 // free socket keepalive for 30 seconds
-});
+import Logger from './logger'
+
+let logger = new Logger()
 
 
-export default class {
-  constructor(server, port) {
+export default class Connect{
+  public ticket:string;
+  constructor(public server, public port) {
     this.ticket = null;
     this.server = server;
     this.port = port;
   }
-  getUrl(name, params) {
+  getUrl(name:string, params?:{id:string}):string {
     let base = `http://${this.server}:${this.port}/${name}`
     if (params){
       return base + '?id=' + params.id;
@@ -26,9 +21,9 @@ export default class {
       return base;
     }
   }
-  get(cb) {
+  get(cb):void {
     let url = this.getUrl('tasks', {id: this.ticket})
-    request.get(url).agent(keepaliveAgent).end((err, res) => {
+    request.get(url).end((err, res) => {
       if(err){
         logger.error('task', "获取任务失败，请检查网络连接！", err.code)
         cb && cb(err)
@@ -60,7 +55,7 @@ export default class {
   }
   submit(data, stats, cb) {
     let url = this.getUrl('tasks', {id: this.ticket})
-    request.post(url).send({data, stats}).agent(keepaliveAgent).end((err, res) => {
+    request.post(url).send({data, stats}).end((err, res) => {
       if(err) {
         cb(err)
       }else{
@@ -76,7 +71,7 @@ export default class {
       arch: process.arch,
       node_version: process.version
     }
-    request.post(url).send(stats).agent(keepaliveAgent).end((err, res) => {
+    request.post(url).send(stats).end((err, res) => {
       if (err) {
         logger.error('regist', "注册Worker失败！" + err.toString())
         cb(err)
@@ -84,7 +79,7 @@ export default class {
         let response = res.body
 
         if (response.code == 202){
-          logger.warn('regist', "服务器的Worker数量已满，请等待")
+          logger.warning('regist', "服务器的Worker数量已满，请等待")
         }else if(response.code == 200){
           logger.success('regist', '已从服务器获得令牌: ' + response.id)
           this.ticket = response.id
