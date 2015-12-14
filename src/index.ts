@@ -1,8 +1,6 @@
 // 三方库以及Nodejs自带库
 import * as _ from 'lodash'
 import * as cheerio from 'cheerio'
-/// <reference path="../libs/require-dir.d.ts" />
-import {requireDir} from 'require-dir' // 将一个目录下所有的文件都require进来
 import * as async from 'async'
 
 import * as os from 'os'
@@ -36,8 +34,8 @@ interface ErrorsProps {
 // 分析器和过滤器
 let analizers:AnalizerFunc[] = []
 // 分析器, analizer目录下所有的东西都会包含进来
-let analizersInDir = requireDir('./analizers', {camelcase: true})
-_.each(analizersInDir, i => analizers.push(i))
+analizers.push(require('./analizers/common')['default'])
+analizers.push(require('./analizers/post')['default'])
 
 export default class Spider{
   private options:any;
@@ -58,6 +56,7 @@ export default class Spider{
     async.forever((next) => {
       // 从服务器获取任务
       this.task.get((err, items) => {
+        logger.info('server', "已从服务器获得任务，任务数量：" + items.length)
         // 获取任务的失败处理
         if (err) {
           logger.info('task',`将于${this.options.retry_interval / 1000}秒后重新尝试连接服务器`)
@@ -70,7 +69,7 @@ export default class Spider{
           } else {
             // 对每个任务执行抓取函数，并将结果提交
             let now = Date.now()
-            async.map(items, this.crawl.bind(this), (err, results) => {
+            async.mapLimit(items, 5, this.crawl.bind(this), (err, results) => {
               let stats = {
                 total_time: Date.now() - now,
                 memory: {
